@@ -27,7 +27,7 @@ from sklearn.preprocessing import StandardScaler
 
 warnings.filterwarnings("ignore")
 
-print("✅ Libraries loaded successfully")
+print(" Libraries loaded successfully")
 
 
 # =============================================================================
@@ -122,7 +122,7 @@ def load_and_preprocess(data_path: str) -> pd.DataFrame:
     with open(data_path, "r", encoding="utf-8") as f:
         raw_data = json.load(f)
 
-    print(f"✅ Loaded {len(raw_data)} places from '{data_path}'")
+    print(f" Loaded {len(raw_data)} places from '{data_path}'")
 
     df = pd.DataFrame(raw_data)
 
@@ -134,7 +134,7 @@ def load_and_preprocess(data_path: str) -> pd.DataFrame:
     for tags in df["tags_clean"]:
         all_tags.update(tags)
 
-    print(f"✅ Step 2 complete — {len(df)} places, {len(all_tags)} unique tags")
+    print(f" Step 2 complete — {len(df)} places, {len(all_tags)} unique tags")
     return df
 
 
@@ -179,10 +179,10 @@ def score_and_filter(df: pd.DataFrame, user_input: dict) -> pd.DataFrame:
     budget_cap   = daily_budget * 0.6
 
     df_filtered = df[df["governorate"] == governorate].copy()
-    print(f"\n📍 Places in {governorate}: {len(df_filtered)}")
+    print(f"\n Places in {governorate}: {len(df_filtered)}")
 
     df_filtered = df_filtered[df_filtered["price_egp"] <= budget_cap].copy()
-    print(f"💰 Daily budget: {daily_budget:.0f} EGP | Price cap: {budget_cap:.0f} EGP")
+    print(f" Daily budget: {daily_budget:.0f} EGP | Price cap: {budget_cap:.0f} EGP")
     print(f"   Places within budget: {len(df_filtered)}")
 
     df_filtered["score"] = df_filtered.apply(
@@ -197,7 +197,7 @@ def score_and_filter(df: pd.DataFrame, user_input: dict) -> pd.DataFrame:
         .copy()
     )
 
-    print(f"\n🏆 Top {max_places} scored places selected")
+    print(f"\n Top {max_places} scored places selected")
     return df_scored, daily_budget
 
 
@@ -354,17 +354,17 @@ def validate_itinerary(itinerary_json: dict, max_budget_per_day: float) -> bool:
 
     missing_summary = [f for f in required_summary if f not in summary]
     if missing_summary:
-        errors.append(f"❌ Missing summary fields: {missing_summary}")
+        errors.append(f" Missing summary fields: {missing_summary}")
     else:
-        passed.append("✅ JSON structure — all required fields present")
+        passed.append(" JSON structure — all required fields present")
 
     for day_data in days:
         for place in day_data["places"]:
             missing_place = [f for f in required_place if f not in place]
             if missing_place:
-                errors.append(f"❌ Place '{place.get('name_en', '?')}' missing: {missing_place}")
+                errors.append(f" Place '{place.get('name_en', '?')}' missing: {missing_place}")
     if not any("missing" in e for e in errors):
-        passed.append("✅ Place fields — all required fields present in every place")
+        passed.append(" Place fields — all required fields present in every place")
 
     # ② Per-Day Constraints
     for day_data in days:
@@ -374,74 +374,74 @@ def validate_itinerary(itinerary_json: dict, max_budget_per_day: float) -> bool:
         n = len(day_data["places"])
 
         if h > rules["max_hours_per_day"]:
-            errors.append(f"❌ Day {d}: {h}h exceeds max {rules['max_hours_per_day']}h")
+            errors.append(f" Day {d}: {h}h exceeds max {rules['max_hours_per_day']}h")
         else:
-            passed.append(f"✅ Day {d}: hours OK ({h}h ≤ {rules['max_hours_per_day']}h)")
+            passed.append(f" Day {d}: hours OK ({h}h ≤ {rules['max_hours_per_day']}h)")
 
         if c > rules["max_budget_per_day"]:
-            errors.append(f"❌ Day {d}: {c} EGP exceeds daily budget {rules['max_budget_per_day']} EGP")
+            errors.append(f" Day {d}: {c} EGP exceeds daily budget {rules['max_budget_per_day']} EGP")
         else:
-            passed.append(f"✅ Day {d}: budget OK ({c:.0f} EGP ≤ {rules['max_budget_per_day']:.0f} EGP)")
+            passed.append(f" Day {d}: budget OK ({c:.0f} EGP ≤ {rules['max_budget_per_day']:.0f} EGP)")
 
         if n < rules["min_places_per_day"]:
-            errors.append(f"❌ Day {d}: only {n} place(s) — too few")
+            errors.append(f" Day {d}: only {n} place(s) — too few")
         elif n > rules["max_places_per_day"]:
-            warnings_list.append(f"⚠️  Day {d}: {n} places — consider reducing for comfort")
+            warnings_list.append(f"  Day {d}: {n} places — consider reducing for comfort")
         else:
-            passed.append(f"✅ Day {d}: place count OK ({n} places)")
+            passed.append(f" Day {d}: place count OK ({n} places)")
 
     # ③ Budget Utilization
     budget_pct = summary["budget_used_pct"]
     if budget_pct < rules["min_budget_used_pct"]:
-        warnings_list.append(f"⚠️  Budget utilization low: {budget_pct}% — model may be too conservative")
+        warnings_list.append(f"  Budget utilization low: {budget_pct}% — model may be too conservative")
     elif budget_pct > 100:
-        errors.append(f"❌ Budget exceeded: {budget_pct}%")
+        errors.append(f" Budget exceeded: {budget_pct}%")
     else:
-        passed.append(f"✅ Budget utilization: {budget_pct}% (within range)")
+        passed.append(f" Budget utilization: {budget_pct}% (within range)")
 
     # ④ Score Quality
     all_scores = [p["score"] for d in days for p in d["places"]]
     avg_score  = sum(all_scores) / len(all_scores) if all_scores else 0
     if avg_score < rules["min_avg_score"]:
-        warnings_list.append(f"⚠️  Average score low: {avg_score:.3f}")
+        warnings_list.append(f" Average score low: {avg_score:.3f}")
     else:
-        passed.append(f"✅ Recommendation quality: avg score {avg_score:.3f} (≥ {rules['min_avg_score']})")
+        passed.append(f" Recommendation quality: avg score {avg_score:.3f} (≥ {rules['min_avg_score']})")
 
     # ⑤ Coordinate Sanity
     for day_data in days:
         for place in day_data["places"]:
             lat, lng = place["latitude"], place["longitude"]
             if not (22.0 <= lat <= 32.0 and 25.0 <= lng <= 37.0):
-                errors.append(f"❌ '{place['name_en']}': coordinates out of Egypt bounds ({lat}, {lng})")
+                errors.append(f" '{place['name_en']}': coordinates out of Egypt bounds ({lat}, {lng})")
     if not any("coordinates" in e for e in errors):
-        passed.append("✅ Coordinates — all places within Egypt bounds")
+        passed.append(" Coordinates — all places within Egypt bounds")
 
     # ⑥ Duplicate Places
     all_ids = [p["id"] for d in days for p in d["places"]]
     if len(all_ids) != len(set(all_ids)):
-        errors.append("❌ Duplicate places detected in itinerary")
+        errors.append(" Duplicate places detected in itinerary")
     else:
-        passed.append("✅ No duplicate places")
+        passed.append(" No duplicate places")
 
     # Print Report
     print("=" * 65)
-    print("           🔍 VALIDATION & QUALITY REPORT")
+    print("            VALIDATION & QUALITY REPORT")
     print("=" * 65)
-    print(f"\n✅ PASSED ({len(passed)})")
+    print(f"\n PASSED ({len(passed)})")
     for p in passed:
         print(f"   {p}")
     if warnings_list:
-        print(f"\n⚠️  WARNINGS ({len(warnings_list)})")
+        print(f"\n WARNINGS ({len(warnings_list)})")
         for w in warnings_list:
             print(f"   {w}")
     if errors:
-        print(f"\n❌ ERRORS ({len(errors)})")
+        print(f"\n ERRORS ({len(errors)})")
         for e in errors:
             print(f"   {e}")
     else:
-        print("\n🎉 NO ERRORS FOUND")
+        print("\n NO ERRORS FOUND")
 
-    status = "🟢 PASSED" if not errors else "🔴 FAILED"
+    status = " PASSED" if not errors else " FAILED"
     print("\n" + "=" * 65)
     print(f"  VALIDATION STATUS  :  {status}")
     print(f"  Governorate        :  {summary['governorate']}")
@@ -473,7 +473,7 @@ def save_artifacts(kmeans, scaler, n_days: int, user_input: dict,
     }
     with open("kmeans_model.pkl", "wb") as f:
         pickle.dump(model_artifacts, f)
-    print("✅ Saved: kmeans_model.pkl")
+    print(" Saved: kmeans_model.pkl")
 
     pipeline_config = {
         "scoring_weights": {
@@ -499,7 +499,7 @@ def save_artifacts(kmeans, scaler, n_days: int, user_input: dict,
     }
     with open("pipeline_config.json", "w", encoding="utf-8") as f:
         json.dump(pipeline_config, f, ensure_ascii=False, indent=2)
-    print("✅ Saved: pipeline_config.json")
+    print(" Saved: pipeline_config.json")
 
     # Verify
     with open("kmeans_model.pkl", "rb") as f:
@@ -509,7 +509,7 @@ def save_artifacts(kmeans, scaler, n_days: int, user_input: dict,
     print(f"   Scaler mean     : {loaded['scaler'].mean_.round(4)}")
     print(f"   Trained on      : {loaded['trained_on_governorate']}")
     print(f"   n_days          : {loaded['n_days']}")
-    print("\n✅ Model artifacts saved")
+    print("\n Model artifacts saved")
 
 
 # =============================================================================
@@ -541,8 +541,8 @@ def pipeline_core(data_path: str, user_input: dict, save: bool = True) -> dict:
     )
     with open(output_filename, "w", encoding="utf-8") as f:
         json.dump(itinerary_json, f, ensure_ascii=False, indent=2)
-    print(f"\n💾 JSON saved: {output_filename}")
-    print("\n📄 JSON Preview (trip_summary):")
+    print(f"\n JSON saved: {output_filename}")
+    print("\n JSON Preview (trip_summary):")
     print(json.dumps(itinerary_json["trip_summary"], ensure_ascii=False, indent=2))
 
     # 6. Validation
@@ -613,7 +613,7 @@ if __name__ == "__main__":
         "interests":     args.interests,
     }
 
-    print("\n📋 User Input:")
+    print("\n User Input:")
     for k, v in USER_INPUT.items():
         print(f"   {k}: {v}")
     print()

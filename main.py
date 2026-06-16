@@ -92,6 +92,13 @@ class HealthResponse(BaseModel):
 # ============================================================
 # Endpoints
 # ============================================================
+@app.get("/")
+def root():
+    return {
+        "status": "running",
+        "docs": "/docs",
+        "health": "/health"
+    }
 @app.get(
     "/health",
     response_model=HealthResponse,

@@ -1,0 +1,27 @@
+{
+  "scoring_weights": {
+    "tag_match": 0.5,
+    "budget_fit": 0.25,
+    "popularity": 0.25
+  },
+  "constraints": {
+    "max_hours_per_day": 8.0,
+    "budget_cap_ratio": 0.6,
+    "max_places_per_trip": "duration_days * 4"
+  },
+  "validation_rules": {
+    "max_hours_per_day": 8.0,
+    "max_budget_per_day": 1000.0,
+    "min_places_per_day": 1,
+    "max_places_per_day": 6,
+    "min_budget_used_pct": 30.0,
+    "min_avg_score": 0.5
+  },
+  "supported_governorates": [
+    "Cairo",
+    "Giza",
+    "Luxor",
+    "Aswan"
+  ],
+  "data_file": "places_all_v1.json"
+}
